@@ -7,7 +7,7 @@ Manager* mainManager = new Manager();
 
 Manager::Manager()
 {
-    nParticles  = 121;
+    nParticles  = 169;
     lSimulation = 900;
     particleFormation = "Rectangle";
 
@@ -103,13 +103,15 @@ void Manager::CalcParticleForces()
     {
         //Reset forces
         particles.at(i).forces.clear();
+
         //Gravity
         FVector force_gravity;
-        force_gravity.y = g;
-        //particles.at(i).forces.push_back(force_gravity);
+        force_gravity.y = 0.001*g;
+        particles.at(i).forces.push_back(force_gravity);
+
         //Pressure
         FVector pressureGrad = particles.at(i).GetPressureGradient();
-        float pressureMag = 0.0005;    //### FIND THIS ###
+        float pressureMag    = particles.at(i).GetPressureMagnitude();
         FVector force_pressure;force_pressure.x = pressureMag*pressureGrad.x;force_pressure.y = pressureMag*pressureGrad.y;
         particles.at(i).forces.push_back(force_pressure);
     }

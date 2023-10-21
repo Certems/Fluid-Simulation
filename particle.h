@@ -23,6 +23,7 @@ class Particle
         void SetAcceleration(float x, float y, float z);
         float GetSpreadEffect(FVector point);
         FVector GetPressureGradient();
+        float GetPressureMagnitude();
         void CalcAcc();
         void CalcVel();
         void CalcPos();

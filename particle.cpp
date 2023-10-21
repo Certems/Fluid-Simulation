@@ -50,31 +50,6 @@ float Particle::GetSpreadEffect(FVector point)
 
     distanceLimit = Specifies distance you want to satify the percentile limit
     distanceLimit = Specifies what percentage of the functions max value (1 here) you want at the distanceLimit (e.g allows you to set when you want the function to decay to 'nothing')
-    
-    ###
-    ###
-    ###
-    ###
-    ###
-    ###
-    ## <<<<<-----------------
-
-    Needs to have reaction forces
-    Also needs finer tuning of density multiplier
-
-    Grad direction may also be wrong
-    magnitude of force seems off too at certain places
-
-    In general needs smoother & more purposeful reactions
-
-    ###
-    ###
-    ###
-    ###
-    ###
-    ###
-    ###
-    
     */
     float distanceLimit    = 0.025*Manager::GetManager()->canvasPixelDim.x;  //** Adjust these values for influence changes
     float percentileLimit  = 0.005;                                          //**
@@ -108,6 +83,14 @@ FVector Particle::GetPressureGradient()
         uPressureGradient.x *= 0.0;uPressureGradient.y *= 0.0;}
     return uPressureGradient;
 }
+float Particle::GetPressureMagnitude()
+{
+    float magnitudeMultiplier = 0.2;
+
+    float spread = Manager::GetManager()->GetSpreadValue(pos, ID);
+    int particleNumber = Manager::GetManager()->nParticles;
+    return magnitudeMultiplier*spread/particleNumber;
+}
 void Particle::CalcAcc()
 {
     acc.x = 0.0;    //Inialise acceleration
@@ -121,6 +104,8 @@ void Particle::CalcVel()
 {
     vel.x += acc.x;
     vel.y += acc.y;
+    vel.x *= 0.9;   //Friction
+    vel.y *= 0.9;   //
 }
 void Particle::CalcPos()
 {

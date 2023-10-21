@@ -5,8 +5,9 @@ int displayFrame   = 0;
 int frameSpeed     = 1;
 int frameFactor    = 1;
 
-boolean paused = false;
+boolean paused      = false;
 boolean showHotkeys = true;
+boolean showClouds  = false;
 
 void setup()
 {
@@ -49,6 +50,9 @@ void keyPressed()
     }
     if(key == 'h'){
         showHotkeys = !showHotkeys;
+    }
+    if(key == 'c'){
+        showClouds = !showClouds;
     }
 }
 
@@ -163,8 +167,9 @@ void displayParticles(int nFrame)
     {
         PVector particleColour = particleColourData.get(nFrame).get(i);
         noStroke();
-        fill(particleColour.x, particleColour.y, particleColour.z, 100);
-        //ellipse(particlePositionData.get(nFrame).get(i).x, particlePositionData.get(nFrame).get(i).y, 7.0*particleSize, 7.0*particleSize);  //Particle Cloud
+        if(showClouds){
+            fill(particleColour.x, particleColour.y, particleColour.z, 100);
+            ellipse(particlePositionData.get(nFrame).get(i).x, particlePositionData.get(nFrame).get(i).y, 7.0*particleSize, 7.0*particleSize);}  //Particle Cloud
         fill(particleColour.x, particleColour.y, particleColour.z);
         ellipse(particlePositionData.get(nFrame).get(i).x, particlePositionData.get(nFrame).get(i).y, particleSize, particleSize);          //Particle Point
     }
@@ -194,5 +199,6 @@ void displayHotkeys()
     text("4-> sFactor-", 20, 110);
     text("4-> sFactor+", 20, 130);
     text("h->     Hide", 20, 150);
+    text("c->   Clouds", 20, 170);
     popStyle();
 }
