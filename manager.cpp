@@ -7,7 +7,7 @@ Manager* mainManager = new Manager();
 
 Manager::Manager()
 {
-    nParticles  = 49;//169;
+    nParticles  = 121;
     lSimulation = 900;
     particleFormation = "Rectangle";
 
@@ -91,6 +91,13 @@ void Manager::CalcParticleForces()
     . Forces are stored in a list on the particle
     . The particle will them sum them and divide through by its own mass when finding the acceleration
     . This allows an arbitrary number of forces to by applied to any particle individually
+
+    for pressure;
+    ########################################################################
+    ### COULD SPEED UP BY FINDING N3 PAIRS SO HALF CALCULATIONS REQUIRED ###
+    ########################################################################
+    1. Create NxN grid (N=particle number)
+    2. Shows all forces each particle has on each other
     */
     for(int i=0; i<particles.size(); i++)
     {
@@ -101,30 +108,28 @@ void Manager::CalcParticleForces()
         force_gravity.y = g;
         //particles.at(i).forces.push_back(force_gravity);
         //Pressure
-        FVector force_pressure = particles.at(i).GetPressureGradient(); //## NOW NEEDS TO ACCOUNT FOR N3 ## --> NEEDS COMPLETE REWORKING
-        //##############################
-        //1. go through each particle
-        //2. find gradient
-        //3. add as a force (on both particles)
-        //###### SEEMS LIKE IM DOUBLING UP ????????????? ###########
-        //##############################
+        FVector pressureGrad = particles.at(i).GetPressureGradient();
+        float pressureMag = 0.0005;    //### FIND THIS ###
+        FVector force_pressure;force_pressure.x = pressureMag*pressureGrad.x;force_pressure.y = pressureMag*pressureGrad.y;
         particles.at(i).forces.push_back(force_pressure);
     }
 }
-float Manager::GetSpreadValue(FVector point)
+float Manager::GetSpreadValue(FVector point, int ignoreIndex)
 {
     /*
     Evaluated for all particles at that point
+    ignoreIndex = index to disregard in summation (usually when evaluating at a particle's exact position), set to -1 if you want all contributions
+
+    ### CAN JUST IGNORE PARTICLES FURTHER THAN SOME DISTANCE, MAY SAVE COMPUTING TIME ###
     */
-    float spreadMultiplier = 0.05;
-    float spreadingFactor  = 0.0;
     //Sum spreading coefficents
+    float spreadingFactor  = 0.0;
     for(int i=0; i<particles.size(); i++)
     {
-        spreadingFactor += particles.at(i).GetSpreadEffect(point);   //### CAN JUST IGNORE PARTICLES FURTHER THAN SOME DISTANCE, MAY SAVE COMPUTING TIME ###
+        if(i != ignoreIndex){
+            spreadingFactor += particles.at(i).GetSpreadEffect(point);}
     }
-    //## MAYBE SOME NORMALISATION HERE TO GET BETWEEN 0 AND 1 AGAIN ##
-    return spreadingFactor*spreadMultiplier;
+    return spreadingFactor;
 }
 FVector Manager::ColourFromDensity(float density)
 {
@@ -163,7 +168,7 @@ void Manager::StoreColoursIntoHistory()
     std::vector<FVector> historySet;
     for(int i=0; i<particles.size(); i++)
     {
-        float densityData  = GetSpreadValue(particles.at(i).pos);
+        float densityData  = GetSpreadValue(particles.at(i).pos, i);
         FVector colourData = ColourFromDensity(densityData);
         historySet.push_back(colourData);
     }

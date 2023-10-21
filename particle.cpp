@@ -76,8 +76,8 @@ float Particle::GetSpreadEffect(FVector point)
     ###
     
     */
-    float distanceLimit    = 0.035*Manager::GetManager()->canvasPixelDim.x;  //** Adjust these values for influence changes
-    float percentileLimit  = 0.005;                                         //**
+    float distanceLimit    = 0.025*Manager::GetManager()->canvasPixelDim.x;  //** Adjust these values for influence changes
+    float percentileLimit  = 0.005;                                          //**
     float radialCoefficent = log(percentileLimit) / (pow(distanceLimit,2));     //Must be negative for a decaying function; closer to 0 => larger range of influence
 
     float dist = std::sqrt(pow(point.x-pos.x,2) + pow(point.y-pos.y,2));        //From the particle centre to the point
@@ -90,19 +90,22 @@ FVector Particle::GetPressureGradient()
     Finds the direction the particle must move to oppose the pressure gradient (reduce pressure => reduce density)
     */
     //Find how density changes in each direction (x,y)
-    float delta_step = 0.001;    //## NEEDS TO BE PROPORTIONAL TO AREA SIZE ##
-    float pressure_initial = Manager::GetManager()->GetSpreadValue(pos);          //Pressure at the particle currently
+    float delta_step = 1.0;    //## NEEDS TO BE PROPORTIONAL TO CANVAS AREA SIZE ##
     FVector adjustedPos_X;adjustedPos_X.x = pos.x +delta_step;adjustedPos_X.y = pos.y;
     FVector adjustedPos_Y;adjustedPos_Y.x = pos.x;            adjustedPos_Y.y = pos.y +delta_step;
-    float pressure_adjusted_X = Manager::GetManager()->GetSpreadValue(adjustedPos_X); //Pressure at the new position from an X adjustment
-    float pressure_adjusted_Y = Manager::GetManager()->GetSpreadValue(adjustedPos_Y); //Pressure at the new position from a Y adjustment
+    float pressure_initial    = Manager::GetManager()->GetSpreadValue(pos, ID);          //Pressure at the particle currently
+    float pressure_adjusted_X = Manager::GetManager()->GetSpreadValue(adjustedPos_X, ID); //Pressure at the new position from an X adjustment
+    float pressure_adjusted_Y = Manager::GetManager()->GetSpreadValue(adjustedPos_Y, ID); //Pressure at the new position from a Y adjustment
     FVector pressureGradient;
-    pressureGradient.x = (pressure_initial -pressure_adjusted_X)/delta_step;
-    pressureGradient.y = (pressure_initial -pressure_adjusted_Y)/delta_step;
+    pressureGradient.x = pressure_initial -pressure_adjusted_X;
+    pressureGradient.y = pressure_initial -pressure_adjusted_Y;
     //Give normalised unit vector for direction it must move
     float gradientMag = std::sqrt(pow(pressureGradient.x,2) + pow(pressureGradient.y,2));
     FVector uPressureGradient;uPressureGradient.x = pressureGradient.x;uPressureGradient.y = pressureGradient.y;
-    uPressureGradient.x *= 1.0/10.0;uPressureGradient.y *= 1.0/10.0; //##### gradientMag ###### ACTUALLY NORMALISE IF NEED BE, CURRENTLY WORKS QUITE WELL WITHOUT #####
+    if(gradientMag != 0.0){
+        uPressureGradient.x *= 1.0/gradientMag;uPressureGradient.y *= 1.0/gradientMag;}
+    else{
+        uPressureGradient.x *= 0.0;uPressureGradient.y *= 0.0;}
     return uPressureGradient;
 }
 void Particle::CalcAcc()

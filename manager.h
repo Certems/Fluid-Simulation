@@ -34,7 +34,7 @@ class Manager
         void Calc_SimulationCycles();
         void Calc_SimulationStep();
         void CalcParticleForces();
-        float GetSpreadValue(FVector point);
+        float GetSpreadValue(FVector point, int ignoreIndex);
         FVector ColourFromDensity(float density);
         void StorePositionsIntoHistory();
         void StoreColoursIntoHistory();
