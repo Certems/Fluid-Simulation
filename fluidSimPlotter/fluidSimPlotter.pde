@@ -39,9 +39,13 @@ void keyPressed()
     }
     if(key == '4'){
         frameFactor--;
+        if(frameFactor == 0){
+            frameFactor--;}
     }
     if(key == '5'){
         frameFactor++;
+        if(frameFactor == 0){
+            frameFactor++;}
     }
     if(key == 'h'){
         showHotkeys = !showHotkeys;
