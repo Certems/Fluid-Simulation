@@ -170,7 +170,7 @@ void Manager::StoreColoursIntoHistory()
     std::vector<FVector> historySet;
     for(int i=0; i<particles.size(); i++)
     {
-        float densityData  = GetSpreadValue(particles.at(i).pos, i);
+        float densityData  = 20.0*GetSpreadValue(particles.at(i).pos, i) / nParticles;
         FVector colourData = ColourFromDensity(densityData);
         historySet.push_back(colourData);
     }
