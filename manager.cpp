@@ -10,6 +10,7 @@ Manager::Manager()
     nParticles  = 169;
     lSimulation = 900;
     particleFormation = "Rectangle";
+    magneticFactor = 10.0;
 
     canvasPixelDim.x = 800;     //Dimensions of the canvas (in pixels) that processing will use, so edge collision can be calculated
     canvasPixelDim.y = 800;     // --> Can be translated into arbitrary units within the program
@@ -84,6 +85,52 @@ void Manager::Calc_SimulationStep()
         particles.at(i).CalcPos();
     }
 }
+FVector Manager::GetMagneticForce(int wallNumber, FVector point)
+{
+    /*
+    'Magnetic' repulsive force from each of the walls
+    */
+    FVector force;
+    float distX = 0.0;
+    float distY = 0.0;
+    if(wallNumber == 0){    //Top
+        distY = abs(-canvasPixelDim.y/2.0 -point.y);}
+    if(wallNumber == 1){    //Bottom
+        distY = -abs( canvasPixelDim.y/2.0 -point.y);}
+    if(wallNumber == 2){    //Left
+        distX = abs(-canvasPixelDim.x/2.0 -point.x);}
+    if(wallNumber == 3){    //Right
+        distX = -abs( canvasPixelDim.x/2.0 -point.x);}
+    float factor = 10.0;
+    if(distX != 0.0){
+        force.x = magneticFactor/distX;}
+    if(distY != 0.0){
+        force.y = magneticFactor/distY;}
+    return force;
+}
+FVector Manager::GetWallForce(int wallNumber, FVector point)
+{
+    /*
+    Slight repulsive force to prevent particles getting stuck on the walls
+    */
+    FVector force;
+    float distX = 0.0;
+    float distY = 0.0;
+    if(wallNumber == 0){    //Top
+        distY = abs(-canvasPixelDim.y/2.0 -point.y);}
+    if(wallNumber == 1){    //Bottom
+        distY = -abs( canvasPixelDim.y/2.0 -point.y);}
+    if(wallNumber == 2){    //Left
+        distX = abs(-canvasPixelDim.x/2.0 -point.x);}
+    if(wallNumber == 3){    //Right
+        distX = -abs( canvasPixelDim.x/2.0 -point.x);}
+    float factor = 0.6;
+    if(distX != 0.0){
+        force.x = factor/distX;}
+    if(distY != 0.0){
+        force.y = factor/distY;}
+    return force;
+}
 void Manager::CalcParticleForces()
 {
     /*
@@ -98,6 +145,18 @@ void Manager::CalcParticleForces()
     ########################################################################
     1. Create NxN grid (N=particle number)
     2. Shows all forces each particle has on each other
+
+
+
+
+    ######
+    ####
+    ##
+    . Stop particles being stuck in wall -> [wall exerts a force] on them to push them back out
+    . Add [input forces] && [input particles]
+    ##
+    ####
+    ######
     */
     for(int i=0; i<particles.size(); i++)
     {
@@ -114,6 +173,18 @@ void Manager::CalcParticleForces()
         float pressureMag    = particles.at(i).GetPressureMagnitude();
         FVector force_pressure;force_pressure.x = pressureMag*pressureGrad.x;force_pressure.y = pressureMag*pressureGrad.y;
         particles.at(i).forces.push_back(force_pressure);
+
+        //Magnetic repulsive --> Pretty fun effect
+        //FVector force_magnetic_top    = GetMagneticForce(0, particles.at(i).pos);particles.at(i).forces.push_back(force_magnetic_top);
+        //FVector force_magnetic_bottom = GetMagneticForce(1, particles.at(i).pos);particles.at(i).forces.push_back(force_magnetic_bottom);
+        //FVector force_magnetic_left   = GetMagneticForce(2, particles.at(i).pos);particles.at(i).forces.push_back(force_magnetic_left);
+        //FVector force_magnetic_right  = GetMagneticForce(3, particles.at(i).pos);particles.at(i).forces.push_back(force_magnetic_right);
+
+        //Wall
+        FVector force_wall_top    = GetWallForce(0, particles.at(i).pos);particles.at(i).forces.push_back(force_wall_top);
+        FVector force_wall_bottom = GetWallForce(1, particles.at(i).pos);particles.at(i).forces.push_back(force_wall_bottom);
+        FVector force_wall_left   = GetWallForce(2, particles.at(i).pos);particles.at(i).forces.push_back(force_wall_left);
+        FVector force_wall_right  = GetWallForce(3, particles.at(i).pos);particles.at(i).forces.push_back(force_wall_right);
     }
 }
 float Manager::GetSpreadValue(FVector point, int ignoreIndex)

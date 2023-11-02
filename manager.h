@@ -25,6 +25,7 @@ class Manager
         std::vector<Particle> particles;
         std::vector<std::vector<FVector>> particlePositionHistory;
         std::vector<std::vector<FVector>> particleColourHistory;
+        float magneticFactor;
 
         //Initialisation
         static Manager* GetManager();
@@ -33,6 +34,8 @@ class Manager
         //Core Loop
         void Calc_SimulationCycles();
         void Calc_SimulationStep();
+        FVector GetWallForce(int wallNumber, FVector point);
+        FVector GetMagneticForce(int wallNumber, FVector point);
         void CalcParticleForces();
         float GetSpreadValue(FVector point, int ignoreIndex);
         FVector ColourFromDensity(float density);
