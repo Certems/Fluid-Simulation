@@ -12,7 +12,7 @@ class Particle
         //pass
     public:
         int ID;
-        const float mass = 0.01;
+        const float mass = 0.001;   //So total mass ~ 1kg
         FVector pos;
         FVector vel;
         FVector acc;
@@ -21,9 +21,9 @@ class Particle
         void SetPosition(float x, float y, float z);
         void SetVelocity(float x, float y, float z);
         void SetAcceleration(float x, float y, float z);
-        float GetSpreadEffect(FVector point);
-        FVector GetPressureGradient();
-        float GetPressureMagnitude();
+
+        //...
+
         void CalcAcc();
         void CalcVel();
         void CalcPos();

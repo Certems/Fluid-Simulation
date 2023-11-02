@@ -16,16 +16,15 @@ class Manager
     private:
         //pass
     public:
+        static constexpr float pixelConversion = 1.0;   //Converts real measurement to pixel measurements --> purely for display in processing
         static constexpr float g = 9.81f;
-        std::string particleFormation;
+        int currentSimulationFrame = 0;
         int nParticles;
         int lSimulation;
         FVector canvasPixelDim;
-        int currentSimulationFrame = 0;
         std::vector<Particle> particles;
         std::vector<std::vector<FVector>> particlePositionHistory;
         std::vector<std::vector<FVector>> particleColourHistory;
-        float magneticFactor;
 
         //Initialisation
         static Manager* GetManager();
@@ -34,10 +33,7 @@ class Manager
         //Core Loop
         void Calc_SimulationCycles();
         void Calc_SimulationStep();
-        FVector GetWallForce(int wallNumber, FVector point);
-        FVector GetMagneticForce(int wallNumber, FVector point);
         void CalcParticleForces();
-        float GetSpreadValue(FVector point, int ignoreIndex);
         FVector ColourFromDensity(float density);
         void StorePositionsIntoHistory();
         void StoreColoursIntoHistory();
