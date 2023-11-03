@@ -5,6 +5,8 @@ int displayFrame   = 0;
 int frameSpeed     = 1;
 int frameFactor    = 1;
 
+float pixelConversion = 800.0/1.0;   //Converts real measurement to pixel measurements --> purely for display in processing (find this by comparing imagined bounding box size in C++ to canvas size here)
+
 boolean paused      = false;
 boolean showHotkeys = true;
 boolean showClouds  = false;
@@ -169,9 +171,9 @@ void displayParticles(int nFrame)
         noStroke();
         if(showClouds){
             fill(particleColour.x, particleColour.y, particleColour.z, 100);
-            ellipse(particlePositionData.get(nFrame).get(i).x, particlePositionData.get(nFrame).get(i).y, 7.0*particleSize, 7.0*particleSize);}  //Particle Cloud
+            ellipse(pixelConversion*particlePositionData.get(nFrame).get(i).x, pixelConversion*particlePositionData.get(nFrame).get(i).y, 7.0*particleSize, 7.0*particleSize);}  //Particle Cloud
         fill(particleColour.x, particleColour.y, particleColour.z);
-        ellipse(particlePositionData.get(nFrame).get(i).x, particlePositionData.get(nFrame).get(i).y, particleSize, particleSize);          //Particle Point
+        ellipse(pixelConversion*particlePositionData.get(nFrame).get(i).x, pixelConversion*particlePositionData.get(nFrame).get(i).y, particleSize, particleSize);          //Particle Point
     }
     popStyle();
     popMatrix();

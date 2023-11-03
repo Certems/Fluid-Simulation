@@ -16,12 +16,11 @@ class Manager
     private:
         //pass
     public:
-        static constexpr float pixelConversion = 1.0;   //Converts real measurement to pixel measurements --> purely for display in processing
         static constexpr float g = 9.81f;
         int currentSimulationFrame = 0;
         int nParticles;
         int lSimulation;
-        FVector canvasPixelDim;
+        FVector canvasDim;
         std::vector<Particle> particles;
         std::vector<std::vector<FVector>> particlePositionHistory;
         std::vector<std::vector<FVector>> particleColourHistory;
@@ -34,6 +33,10 @@ class Manager
         void Calc_SimulationCycles();
         void Calc_SimulationStep();
         void CalcParticleForces();
+        float GetKernalAt(Particle cParticle, FVector point);
+        float GetDensityAt(FVector point);
+        float GetPressureAt(FVector point);
+        FVector GetPressureGradientAt(FVector point);
         FVector ColourFromDensity(float density);
         void StorePositionsIntoHistory();
         void StoreColoursIntoHistory();

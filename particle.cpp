@@ -72,23 +72,23 @@ void Particle::CalcRebound()
     Calculates the rebound of particles if they collide with walls
     Note; The centre of the canvas is treated as the origin
     */
-    FVector dim = Manager::GetManager()->canvasPixelDim;
+    FVector dim = Manager::GetManager()->canvasDim;
     //If out of X bounds
     if(pos.x < -dim.x/2.0){
         vel.x = -vel.x;                         //Flip X velocity
-        pos.x = std::max(-dim.x/2.0 +1, (-dim.x/2.0 -pos.x) -dim.x/2.0); //Move into frame
+        pos.x = std::max(-dim.x/2.0 +dim.x/100.0, (-dim.x/2.0 -pos.x) -dim.x/2.0); //Move into frame
     }
     if(pos.x > dim.x/2.0){
         vel.x = -vel.x;                         //Flip X velocity
-        pos.x = std::min(dim.x/2.0 -1, (dim.x/2.0 -pos.x) +dim.x/2.0);  //Move into frame
+        pos.x = std::min(dim.x/2.0 -dim.x/100.0, (dim.x/2.0 -pos.x) +dim.x/2.0);  //Move into frame
     }
     //If out of Y bounds
     if(pos.y < -dim.y/2.0){
         vel.y = -vel.y;                         //Flip Y velocity
-        pos.y = std::max(-dim.y/2.0 +1, (-dim.y/2.0 -pos.x) -dim.y/2.0); //Move into frame
+        pos.y = std::max(-dim.y/2.0 +dim.y/100.0, (-dim.y/2.0 -pos.x) -dim.y/2.0); //Move into frame
     }
     if(pos.y > dim.y/2.0){
         vel.y = -vel.y;                         //Flip Y velocity
-        pos.y = std::min(dim.y/2.0 -1, (dim.y/2.0 -pos.x) +dim.y/2.0);  //Move into frame
+        pos.y = std::min(dim.y/2.0 -dim.y/100.0, (dim.y/2.0 -pos.x) +dim.y/2.0);  //Move into frame
     }
 }
