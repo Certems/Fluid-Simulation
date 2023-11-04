@@ -7,10 +7,10 @@ Manager* mainManager = new Manager();
 
 Manager::Manager()
 {
-    nParticles  = 36;//169;
-    lSimulation = 400;
-    canvasDim.x = 1.0;     //Dimensions of the canvas (in metres)
-    canvasDim.y = 1.0;     //Converted to pixels in processing when displayed
+    nParticles  = 600;//169;
+    lSimulation = 100;
+    canvasDim.x = 10.0;     //Dimensions of the canvas (in metres)
+    canvasDim.y = 10.0;     //Converted to pixels in processing when displayed
 
     Generate_ParticleArray();
 }
@@ -94,11 +94,13 @@ void Manager::CalcParticleForces()
 
         //Gravity
         FVector force_gravity;
-        force_gravity.y = g;
-        //particles.at(i).forces.push_back(force_gravity);
+        force_gravity.y = 0.1*g/60.0f;
+        particles.at(i).forces.push_back(force_gravity);
 
         //Pressure
-        //...
+        FVector force_pressureGrad = GetPressureGradientAt(particles.at(i).pos);
+        force_pressureGrad.x /= 400.0;force_pressureGrad.y /= 400.0;
+        particles.at(i).forces.push_back(force_pressureGrad);
 
         //Viscosity
         //...
@@ -110,7 +112,8 @@ float Manager::GetKernalAt(Particle cParticle, FVector point)
     Gets the value of the kernal for the ith particle, cParticle, at the 
     position specified, point
     */
-    float rangeFactor = 171.7;    //Keep positive, so exp power is negative, so we have a gaussian --> this on chosen so at dist=0.0125 ~ 10 pixels the value is 1% of max value (1) --> increase to ~420.5 when doing proper simulation so its influence ends at the edge of the visible boundary given to it
+   //## THIS TERM NEEDS SERIOUS ADJUSTMENT ##
+    float rangeFactor = 5;//171.7;    //Keep positive, so exp power is negative, so we have a gaussian --> this on chosen so at dist=0.0125 ~ 10 pixels the value is 1% of max value (1) --> increase to ~420.5 when doing proper simulation so its influence ends at the edge of the visible boundary given to it
 
     float dist   = sqrt(pow(cParticle.pos.x -point.x, 2) + pow(cParticle.pos.y -point.y, 2));   //In real units
     float volume = (2.0*3.1415)*(sqrt(3.1415/rangeFactor));
@@ -118,27 +121,32 @@ float Manager::GetKernalAt(Particle cParticle, FVector point)
     float kernal_normalised = kernal/volume;
     return kernal_normalised;
 }
-float GetDensityAt(FVector point)
+float Manager::GetDensityAt(FVector point)
 {
     /*
     Finds the density by;
     1. Considering the kernal of all particles at position specified
     2. ...
     */
-    //pass
-    return 0.0;
+    float kernalTotal = 0.0;
+    for(int i=0; i<particles.size(); i++)
+    {
+        kernalTotal += GetKernalAt(particles.at(i), point);
+    }
+    return kernalTotal;
 }
-float GetPressureAt(FVector point)
+float Manager::GetPressureAt(FVector point)
 {
     /*
     Finds the pressure by;
     1. Considering the kernal of all particles at position specified
     2. ...
     */
-    //pass
-    return 0.0;
+    float pressureFactor = 10.0;             //## LIKELY WILL GIVE AN ACCURATE REPRESENTATION ##
+    float density = GetDensityAt(point);
+    return pressureFactor*density;
 }
-FVector GetPressureGradientAt(FVector point)
+FVector Manager::GetPressureGradientAt(FVector point)
 {
     /*
     Finds the pressure gradient by;
@@ -148,7 +156,7 @@ FVector GetPressureGradientAt(FVector point)
     */
     float delta = Manager::GetManager()->canvasDim.x/200.0;   //## MAYBE SMALLER IS REQUIRED, SEE HOW IT GOES
     FVector point_dx;point_dx.x = point.x +delta;point_dx.y = point.y;
-    FVector point_dy;point_dx.x = point.x;       point_dx.y = point.y +delta;
+    FVector point_dy;point_dy.x = point.x;       point_dy.y = point.y +delta;
     float pressure_dx           = GetPressureAt(point_dx);
     float pressure_dy           = GetPressureAt(point_dy);
     float pressure_central      = GetPressureAt(point);

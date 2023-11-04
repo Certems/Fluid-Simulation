@@ -12,7 +12,7 @@ class Particle
         //pass
     public:
         int ID;
-        const float mass = 0.001;   //So total mass ~ 1kg
+        const float mass = 1.0;   //So total mass ~ 1kg
         FVector pos;
         FVector vel;
         FVector acc;
