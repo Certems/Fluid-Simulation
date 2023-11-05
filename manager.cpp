@@ -7,8 +7,8 @@ Manager* mainManager = new Manager();
 
 Manager::Manager()
 {
-    nParticles  = 600;//169;
-    lSimulation = 100;
+    nParticles  = 400;
+    lSimulation = 200;
     canvasDim.x = 10.0;     //Dimensions of the canvas (in metres)
     canvasDim.y = 10.0;     //Converted to pixels in processing when displayed
 
@@ -56,6 +56,7 @@ void Manager::Calc_SimulationCycles()
     */
     while(currentSimulationFrame < lSimulation)
     {
+        std::cout<<"Frame "<<currentSimulationFrame<<" /"<<lSimulation<<std::endl;
         StorePositionsIntoHistory();    //So it stores the initial position first
         StoreColoursIntoHistory();
         Calc_SimulationStep();
@@ -104,6 +105,18 @@ void Manager::CalcParticleForces()
 
         //Viscosity
         //...
+        //Add this once inviscid fluid behaves correctly
+        //...
+
+        //Gravity Well
+        FVector gWell_source;   //At (0,0)
+        FVector force_gWell = GetGravityWell(1.0, gWell_source, particles.at(i).pos);
+        particles.at(i).forces.push_back(force_gWell);
+
+        //Gravity Push
+        FVector gPush_source;gPush_source.y = Manager::GetManager()->canvasDim.y*0.4;   //At (0,canvasDim.y*0.4)
+        FVector force_gPush = GetGravityPush(1.0, gPush_source, particles.at(i).pos);
+        particles.at(i).forces.push_back(force_gPush);
     }
 }
 float Manager::GetKernalAt(Particle cParticle, FVector point)
@@ -162,6 +175,32 @@ FVector Manager::GetPressureGradientAt(FVector point)
     float pressure_central      = GetPressureAt(point);
     FVector pressure_grad;pressure_grad.x = (pressure_central-pressure_dx)/delta;pressure_grad.y = (pressure_central-pressure_dy)/delta;
     return pressure_grad;
+}
+FVector Manager::GetGravityWell(float strMultiplier, FVector source, FVector point)
+{
+    /*
+    Exerts a force around a source position, such that all forces point inwards to the source 
+    and the force decays with distance
+    */
+    FVector force;
+    float dist      = sqrt(pow(source.x -point.x, 2) + pow(source.y -point.y, 2));   //In real units
+    float strength  = strMultiplier*(0.05)*exp(-pow(0.6*dist,2));
+    FVector unitDir;unitDir.x = (source.x-point.x)/dist;unitDir.y = (source.y-point.y)/dist;
+    force.x = unitDir.x*strength;force.y = unitDir.y*strength;
+    return force;
+}
+FVector Manager::GetGravityPush(float strMultiplier, FVector source, FVector point)
+{
+    /*
+    Exerts a force around a source position, such that all forces point outwards to the source 
+    and the force decays with distance
+    */
+    FVector force;
+    float dist      = sqrt(pow(source.x -point.x, 2) + pow(source.y -point.y, 2));   //In real units
+    float strength  = strMultiplier*(0.05)*exp(-pow(0.6*dist,2));
+    FVector unitDir;unitDir.x = (-source.x+point.x)/dist;unitDir.y = (-source.y+point.y)/dist;
+    force.x = unitDir.x*strength;force.y = unitDir.y*strength;
+    return force;
 }
 FVector Manager::ColourFromDensity(float density)
 {

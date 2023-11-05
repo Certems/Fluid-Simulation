@@ -37,6 +37,8 @@ class Manager
         float GetDensityAt(FVector point);
         float GetPressureAt(FVector point);
         FVector GetPressureGradientAt(FVector point);
+        FVector GetGravityWell(float strMultiplier, FVector source, FVector point);
+        FVector GetGravityPush(float strMultiplier, FVector source, FVector point);
         FVector ColourFromDensity(float density);
         void StorePositionsIntoHistory();
         void StoreColoursIntoHistory();
