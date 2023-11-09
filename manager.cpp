@@ -7,7 +7,7 @@ Manager* mainManager = new Manager();
 
 Manager::Manager()
 {
-    nParticles  = 400;
+    nParticles  = 300;
     lSimulation = 200;
     canvasDim.x = 10.0;     //Dimensions of the canvas (in metres)
     canvasDim.y = 10.0;     //Converted to pixels in processing when displayed
@@ -116,7 +116,7 @@ void Manager::CalcParticleForces()
         //Gravity Push
         FVector gPush_source;gPush_source.y = Manager::GetManager()->canvasDim.y*0.4;   //At (0,canvasDim.y*0.4)
         FVector force_gPush = GetGravityPush(1.0, gPush_source, particles.at(i).pos);
-        particles.at(i).forces.push_back(force_gPush);
+        //particles.at(i).forces.push_back(force_gPush);
     }
 }
 float Manager::GetKernalAt(Particle cParticle, FVector point)
@@ -167,7 +167,7 @@ FVector Manager::GetPressureGradientAt(FVector point)
     2. Travel deltaX & deltaY separately, find the pressure at these points
     3. Use the difference between the central pressure and these stepped pressures, all divided by the step made
     */
-    float delta = Manager::GetManager()->canvasDim.x/200.0;   //## MAYBE SMALLER IS REQUIRED, SEE HOW IT GOES
+    float delta = Manager::GetManager()->canvasDim.x/1000.0;   //## MAYBE SMALLER IS REQUIRED, SEE HOW IT GOES
     FVector point_dx;point_dx.x = point.x +delta;point_dx.y = point.y;
     FVector point_dy;point_dy.x = point.x;       point_dy.y = point.y +delta;
     float pressure_dx           = GetPressureAt(point_dx);
@@ -210,7 +210,8 @@ FVector Manager::ColourFromDensity(float density)
     High density => Red  colour
     */
     FVector newColour;
-    float factor = 1.0; //## Remake this ##
+    float approxDensityMax = 1.7;   //Roughly maximum density seen; enough such that density variation is visible
+    float factor = density/approxDensityMax;
     newColour.x = 255.0*(factor);
     newColour.y = 10.0;
     newColour.z = 255.0*(1.0-factor);
@@ -239,7 +240,7 @@ void Manager::StoreColoursIntoHistory()
     std::vector<FVector> historySet;
     for(int i=0; i<particles.size(); i++)
     {
-        float densityData  = 0.0;   //## REDO THIS ##
+        float densityData  = GetDensityAt(particles.at(i).pos);
         FVector colourData = ColourFromDensity(densityData);
         historySet.push_back(colourData);
     }
